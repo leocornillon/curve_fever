@@ -5,10 +5,12 @@ const DEFAULT_RADIUS = 5;
 const DEFAULT_ANGLE_TICK = Math.PI / 50;
 const DEFAULT_TRANSPARENT_CHANCE = 0.005;
 const DEFAULT_TRANSPARENT_TIME = 300;
-const DEFAULT_SAMPLING = 10;
 
 export default class Player {
 
+    private readonly id: number;
+    private readonly rightControl: string;
+    private readonly leftControl: string;
     private x: number;
     private y: number;
     private vx: number;
@@ -19,34 +21,36 @@ export default class Player {
     private color: string;
     private isSolid: boolean = true;
     private isDead: boolean = false;
-    private sampling: number = 0;
 
     // Those boolean are mandatory to simulate a long keyPress
     private rotatingLeft: boolean = false;
     private rotatingRight: boolean = false;
 
-    constructor(_x: number, _y: number, _angle: number, _color: string) {
+    constructor(_id: number, _x: number, _y: number, _angle: number, _color: string, _left: string, _right: string) {
+        this.id = _id;
         this.x = _x;
         this.y = _y;
         this.angle = _angle;
         this.color = _color;
         this.radius = DEFAULT_RADIUS;
         this.velocity = DEFAULT_VELOCITY;
+        this.rightControl = _right;
+        this.leftControl = _left;
 
         this.vx = this.velocity * Math.cos(this.angle);
         this.vy = this.velocity * Math.sin(this.angle);
 
         // Add a keyboard listener when the player start rotating
         document.addEventListener('keydown', (ev: KeyboardEvent) => {
-            if(ev.key === 'ArrowRight') this.rotatingRight = true;
-            else if(ev.key === 'ArrowLeft') this.rotatingLeft = true;
+            if(ev.key === this.rightControl) this.rotatingRight = true;
+            else if(ev.key === this.leftControl) this.rotatingLeft = true;
         });
 
         // Stop rotating when the player release the key
         document.addEventListener('keyup', (ev: KeyboardEvent) => {
-            if(ev.key === 'ArrowRight') this.rotatingRight = false;
-            else if(ev.key === 'ArrowLeft') this.rotatingLeft = false;
-        })
+            if(ev.key === this.rightControl) this.rotatingRight = false;
+            else if(ev.key === this.leftControl) this.rotatingLeft = false;
+        });
     }
 
     private movePlayer = () => {
@@ -80,18 +84,7 @@ export default class Player {
         ctx.fill();
     };
 
-    private setTransparent = () => {
-        this.isSolid = false;
-        this.color = 'yellow';
-        setTimeout(() => {
-            this.isSolid = true;
-            this.color = 'blue';
-        }, DEFAULT_TRANSPARENT_TIME);
-    };
-
     private savePlayerPosition = () => {
-
-        console.log('Saving');
 
         // We don't save the position if the player is transparent
         if(!this.isSolid) return;
@@ -99,6 +92,7 @@ export default class Player {
         const canvas = MainCanvas.getInstance();
         const buffer = canvas.getBufferPlayerPosition();
         buffer.push({
+            id: this.id,
             angle: this.angle,
             x: this.x,
             y: this.y,
@@ -109,8 +103,6 @@ export default class Player {
 
     private checkPlayerStatus = () => {
 
-        console.log('Checking');
-
         const canvas = MainCanvas.getInstance();
 
         // If we are outside the board
@@ -120,15 +112,33 @@ export default class Player {
             this.y - this.radius <= 0
         ) this.isDead = true;
 
-        // If the player touch another player trailer
+        // If the player touch another player trailer, he is dead
         const gameBoard = canvas.getGameBoard();
-        for(let i=Math.ceil(this.x - this.radius); i<=Math.ceil(this.x + this.radius); i++)
-            for(let j=Math.ceil(this.y - this.radius); j<=Math.ceil(this.y + this.radius); j++)
-                if(gameBoard[i][j] && this.isSolid) this.isDead = true;
-
+        let colisionNumber = 0, colisionChecked = 0;
+        for(let i=this.angle - Math.PI / 2; i<=this.angle + Math.PI / 2; i+=0.1) {
+            const x = Math.ceil(this.x + this.radius * Math.cos(i));
+            const y = Math.ceil(this.y + this.radius * Math.sin(i));
+            if (gameBoard[x][y] !== 0 && this.isSolid) colisionNumber++;
+            colisionChecked++;
+        }
+        // We need to apply a colision rate to be sure the colision is not an error
+        if( colisionNumber / colisionChecked > 0.3) this.isDead = true;
 
         // Change the color if the player is dead
-        if(this.isDead) this.color = 'red';
+        if(this.isDead){
+            this.color = 'red';
+        }
+    };
+
+    private checkItems = () => {
+        const items = MainCanvas.getInstance().getItemList();
+        for(let item of items){
+            // Check if the player touch the item
+            const distanceToItem = Math.sqrt((this.x - item.getX()) ** 2 + (this.y - item.getY()) ** 2);
+            if(distanceToItem < this.radius + 40) {
+                console.log('Touching item');
+            }
+        }
     };
 
     public render() {
@@ -138,19 +148,35 @@ export default class Player {
 
         this.movePlayer();
 
+        this.checkItems();
+
         if(Math.random() <= DEFAULT_TRANSPARENT_CHANCE && this.isSolid) this.setTransparent();
 
-        if(this.sampling === DEFAULT_SAMPLING){
-            this.checkPlayerStatus();
-            this.sampling = 0;
-        }
+        this.checkPlayerStatus();
 
         this.drawPlayer();
 
-        if(!this.isDead && this.sampling === Math.ceil(DEFAULT_SAMPLING / 2)) this.savePlayerPosition();
-
-        this.sampling++;
+        if(!this.isDead) this.savePlayerPosition();
 
     }
+
+
+    /************************************************
+     * Here comes function that alterate the player's status
+     ************************************************/
+
+    private setTransparent = (delay?: number) => {
+        this.isSolid = false;
+        setTimeout(() => {
+            this.isSolid = true;
+        }, delay || DEFAULT_TRANSPARENT_TIME);
+    };
+
+    /*private accelerate = () => {
+        this.velocity *= 2;
+        setTimeout(() => {
+            this.velocity /= 2;
+        }, 2000)
+    };*/
 
 }

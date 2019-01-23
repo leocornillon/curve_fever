@@ -1,8 +1,10 @@
 
 import Player from './Player';
-import {getRandomArbitrary} from '../utils/math';
+import Item from "./Item";
+import {getRandomArbitrary, getRandomColor} from '../utils/math';
+import {setInterval} from "timers";
 
-const DEFAULT_PLAYER_NUMBER = 1;
+const DEFAULT_ITEM_RATE = 0.001;
 
 export default class MainCanvas {
 
@@ -10,13 +12,17 @@ export default class MainCanvas {
 
     private width: number;
     private height: number;
-    private playerList: Player[];
+    private playerList: Player[] = [];
+    private itemList: Item[] = [];
 
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
+    private ctxImage: ImageData;
 
-    private bufferPlayerPosition: Array<{angle: number, x: number, y: number, radius: number, color: string}>;
-    private gameBoard: boolean[][];
+    private bufferPlayerPosition: Array<{id: number, angle: number, x: number, y: number, radius: number, color: string}>;
+    private gameBoard: number[][];
+
+    private fps_counter: number = 0;
 
     private constructor() { }
 
@@ -50,7 +56,7 @@ export default class MainCanvas {
         this.canvas.style.position = 'absolute';
 
         //Set context
-        const context = this.canvas.getContext("2d");
+        const context = this.canvas.getContext("2d", { alpha: false });
         if(context === null) {
             throw new Error(`Could not create main canvas context`);
         } else {
@@ -64,10 +70,6 @@ export default class MainCanvas {
         this.bufferPlayerPosition = [];
         this.initializeGameBoard();
 
-        // Draw the background
-        this.ctx.fillStyle = 'black';
-        this.ctx.fillRect(0, 0, this.width, this.height);
-
         // First render
         this.render();
 
@@ -80,9 +82,14 @@ export default class MainCanvas {
             this.canvas.width = this.width;
             this.canvas.height = this.height;
 
-            this.ctx.fillStyle = 'black';
-            this.ctx.fillRect(0, 0, this.width, this.height);
+            this.drawBackground();
         });
+
+        // Print FPS in the console
+        setInterval(() => {
+            console.log(`${this.fps_counter} FPS`);
+            this.fps_counter = 0;
+        }, 1000)
     };
 
     /**
@@ -90,10 +97,28 @@ export default class MainCanvas {
      */
     public render = () => {
 
+        this.drawBackground();
+
+        if(this.ctxImage !== undefined)
+            this.ctx.putImageData(this.ctxImage, 0, 0);
+
+        this.savePlayersPosition();
+
+        this.drawPlayerTrailers();
+
+        this.ctxImage = this.ctx.getImageData(0, 0, this.width, this.height);
+
+        // Add and draw items
+        this.manageItems();
+
+        // Empty the positions buffer
+        this.bufferPlayerPosition = [];
+
         // Render each players
         this.playerList.forEach(player => player.render());
 
-        this.drawPlayerTrailers();
+        //Count the number of frames
+        this.fps_counter++;
 
         // Request a new frame
         window.requestAnimationFrame(this.render);
@@ -101,58 +126,82 @@ export default class MainCanvas {
 
     public getContext = () => this.ctx;
     public getBufferPlayerPosition = () => this.bufferPlayerPosition;
+    public getItemList = () => this.itemList;
     public getGameBoard = () => this.gameBoard;
     public getWith = () => this.width;
     public getHeiht = () => this.height;
 
     private initializePlayers = () => {
-        this.playerList = [];
-        for(let i=0; i<DEFAULT_PLAYER_NUMBER ; i++){
-            this.playerList.push(new Player(
-                getRandomArbitrary(0, this.width),
-                getRandomArbitrary(0, this.height),
-                getRandomArbitrary(0, Math.PI * 2),
-                'blue'
-            ));
-        }
+        this.playerList.push( new Player(
+            1,
+            getRandomArbitrary(0, this.width - 50),
+            getRandomArbitrary(0, this.height - 50),
+            Math.random() * Math.PI * 2,
+            getRandomColor(),
+            'ArrowLeft',
+            'ArrowRight'
+        ));
+        this.playerList.push( new Player(
+            2,
+            getRandomArbitrary(0, this.width - 50),
+            getRandomArbitrary(0, this.height - 50),
+            Math.random() * Math.PI * 2,
+            getRandomColor(),
+            'q',
+            'd'
+        ));
     };
 
     private initializeGameBoard = () => {
-        this.gameBoard = new Array<boolean[]>(this.width);
+        this.gameBoard = new Array<number[]>(this.width);
         for(let i=0; i<this.width; i++){
-            this.gameBoard[i] = new Array<boolean>(this.height);
+            this.gameBoard[i] = new Array<number>(this.height);
         }
         for(let i=0; i<this.width; i++)
             for(let j=0; j<this.height; j++)
-                this.gameBoard[i][j] = false;
+                this.gameBoard[i][j] = 0;
+    };
+
+    private savePlayersPosition = () => {
+        // Get the latest positions of the players
+        for(let position of this.bufferPlayerPosition){
+            // Save the latest position in the game board
+            for(let i=((position.angle + Math.PI) % Math.PI*2) - Math.PI / 2 + 0.2; i<((position.angle + Math.PI) % Math.PI*2) + Math.PI / 2; i+=0.1){
+                const x = Math.ceil(position.x + position.radius * Math.cos(i));
+                const y = Math.ceil(position.y + position.radius * Math.sin(i));
+                this.gameBoard[x][y] = position.id;
+            }
+        }
+
     };
 
     private drawPlayerTrailers = () => {
 
-        // Get the latest positions of the players
-        for(let position of this.bufferPlayerPosition){
-
-            // Draw the latest postion
+        for(let position of this.bufferPlayerPosition) {
             this.ctx.fillStyle = position.color;
             this.ctx.beginPath();
             this.ctx.arc(position.x, position.y, position.radius, 0, Math.PI * 2, false);
             this.ctx.fill();
-
-            // Save the latest position in the game board
-            for(let i=Math.ceil(position.x - position.radius); i<=Math.ceil(position.x + position.radius); i++)
-                for(let j=Math.ceil(position.y - position.radius); j<=Math.ceil(position.y + position.radius); j++)
-                    this.gameBoard[i][j] = true;
-            /*for(let i=position.angle - Math.PI / 4; i<=position.angle + Math.PI / 4; i+=0.1){
-                const x = Math.ceil(position.x + (position.radius + 1) * Math.cos(i));
-                const y = Math.ceil(position.y + (position.radius + 1) * Math.sin(i));
-                this.gameBoard[x][y] = true;
-            }*/
         }
 
-        // Empty the positions buffer
-        this.bufferPlayerPosition = [];
-
     };
+
+    private drawBackground = () => {
+        this.ctx.fillStyle = 'black';
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.ctx.fillRect(0, 0, this.width, this.height);
+    };
+
+    private manageItems = () => {
+        if(Math.random() < DEFAULT_ITEM_RATE){
+            this.itemList.push(new Item(
+                getRandomArbitrary(0, this.width),
+                getRandomArbitrary(0, this.height)
+            ))
+        }
+
+        this.itemList.forEach(item => item.render());
+    }
 
 
 }
