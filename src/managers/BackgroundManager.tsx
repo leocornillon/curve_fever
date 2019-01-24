@@ -39,10 +39,10 @@ export default class BackgroundManager {
     private initializeGameBoard = () => {
         this.gameBoard = new Array<number[]>(this.gameOrchestrator.getWith());
         for(let i=0; i<this.gameOrchestrator.getWith(); i++){
-            this.gameBoard[i] = new Array<number>(this.gameOrchestrator.getHeiht());
+            this.gameBoard[i] = new Array<number>(this.gameOrchestrator.getHeight());
         }
         for(let i=0; i<this.gameOrchestrator.getWith(); i++)
-            for(let j=0; j<this.gameOrchestrator.getHeiht(); j++)
+            for(let j=0; j<this.gameOrchestrator.getHeight(); j++)
                 this.gameBoard[i][j] = 0;
     };
 
@@ -76,7 +76,7 @@ export default class BackgroundManager {
 
         this.canvas = _canvas || this.canvas;
         this.canvas.width = this.gameOrchestrator.getWith();
-        this.canvas.height = this.gameOrchestrator.getHeiht();
+        this.canvas.height = this.gameOrchestrator.getHeight();
 
         // Set default canvas style
         this.canvas.style.zIndex = '1';

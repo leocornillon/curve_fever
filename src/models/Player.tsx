@@ -105,7 +105,7 @@ export default class Player {
         // If we are outside the board
         if( this.x + this.radius >= GameOrchestrator.getInstance().getWith() - 1 ||
             this.x - this.radius <= 1 ||
-            this.y + this.radius >= GameOrchestrator.getInstance().getHeiht() ||
+            this.y + this.radius >= GameOrchestrator.getInstance().getHeight() ||
             this.y - this.radius <= 0
         ) this.isDead = true;
 

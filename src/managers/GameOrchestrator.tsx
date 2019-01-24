@@ -1,5 +1,6 @@
 
 import BackgroundManager from "./BackgroundManager";
+import ItemManager from "./ItemManager";
 import PlayerManager from "./PlayerManager";
 import UIManager from "./UIManager";
 
@@ -8,6 +9,7 @@ export default class GameOrchestrator {
     private static instance: GameOrchestrator;
 
     private backgroundManager: BackgroundManager;
+    private itemManager: ItemManager;
     private playerManager: PlayerManager;
     private uiManager: UIManager;
 
@@ -30,6 +32,7 @@ export default class GameOrchestrator {
     private render = () => {
 
         this.backgroundManager.render();
+        this.itemManager.render();
         this.playerManager.render();
         this.uiManager.render();
 
@@ -43,10 +46,11 @@ export default class GameOrchestrator {
      *********************************/
 
     public getWith = () => this.width;
-    public getHeiht = () => this.height;
+    public getHeight = () => this.height;
 
     public initializeGame = (
         backgroundCanvas: HTMLCanvasElement,
+        itemCanvas: HTMLCanvasElement,
         playerCanvas: HTMLCanvasElement,
         uiCanvas: HTMLCanvasElement,
         ) => {
@@ -57,9 +61,11 @@ export default class GameOrchestrator {
 
         // Initialize managers
         this.backgroundManager = BackgroundManager.getInstance();
+        this.itemManager = ItemManager.getInstance();
         this.playerManager = PlayerManager.getInstance();
         this.uiManager = UIManager.getInstance();
         this.backgroundManager.initializeCanvas(backgroundCanvas);
+        this.itemManager.initializeCanvas(itemCanvas);
         this.playerManager.initializeCanvas(playerCanvas);
         this.uiManager.initializeCanvas(uiCanvas);
 

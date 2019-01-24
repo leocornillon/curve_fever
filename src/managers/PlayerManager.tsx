@@ -33,7 +33,7 @@ export default class PlayerManager {
         this.playerList.push( new Player(
             1,
             getRandomArbitrary(0, this.gameOrchestrator.getWith() - 50),
-            getRandomArbitrary(0, this.gameOrchestrator.getHeiht() - 50),
+            getRandomArbitrary(0, this.gameOrchestrator.getHeight() - 50),
             Math.random() * Math.PI * 2,
             getRandomColor(),
             'ArrowLeft',
@@ -42,7 +42,7 @@ export default class PlayerManager {
         this.playerList.push( new Player(
             2,
             getRandomArbitrary(0, this.gameOrchestrator.getWith() - 50),
-            getRandomArbitrary(0, this.gameOrchestrator.getHeiht() - 50),
+            getRandomArbitrary(0, this.gameOrchestrator.getHeight() - 50),
             Math.random() * Math.PI * 2,
             getRandomColor(),
             'q',
@@ -86,10 +86,10 @@ export default class PlayerManager {
 
         this.canvas = _canvas || this.canvas;
         this.canvas.width = this.gameOrchestrator.getWith();
-        this.canvas.height = this.gameOrchestrator.getHeiht();
+        this.canvas.height = this.gameOrchestrator.getHeight();
 
         // Set default canvas style
-        this.canvas.style.zIndex = '2';
+        this.canvas.style.zIndex = '3';
         this.canvas.style.top = '0';
         this.canvas.style.left = '0';
         this.canvas.style.position = 'absolute';
@@ -108,7 +108,7 @@ export default class PlayerManager {
     };
 
     public render = () => {
-        this.ctx.clearRect(0, 0, this.gameOrchestrator.getWith(), this.gameOrchestrator.getHeiht());
+        this.ctx.clearRect(0, 0, this.gameOrchestrator.getWith(), this.gameOrchestrator.getHeight());
         this.drawPlayers();
         this.savePlayersPosition();
     }

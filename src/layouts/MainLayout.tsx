@@ -14,7 +14,8 @@ export default class MainLayout extends React.Component<MainLayoutProps, MainLay
         // Assigned the canvas
         const gameOrchestrator = GameOrchestrator.getInstance();
         gameOrchestrator.initializeGame(
-            this.refs.backroundCanvas as HTMLCanvasElement,
+            this.refs.backgroundCanvas as HTMLCanvasElement,
+            this.refs.itemCanvas as HTMLCanvasElement,
             this.refs.playerCanvas as HTMLCanvasElement,
             this.refs.UICanvas as HTMLCanvasElement
         );
@@ -27,8 +28,8 @@ export default class MainLayout extends React.Component<MainLayoutProps, MainLay
     render() {
         return (
             <React.Fragment>
-                <canvas ref={'backroundCanvas'}/>
-                <canvas ref={'itemsCanvas'} />
+                <canvas ref={'backgroundCanvas'}/>
+                <canvas ref={'itemCanvas'} />
                 <canvas ref={'playerCanvas'} />
                 <canvas ref={'UICanvas'} />
             </React.Fragment>
