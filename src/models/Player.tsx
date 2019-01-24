@@ -1,10 +1,7 @@
-import MainCanvas from "./MainCanvas";
-
-const DEFAULT_VELOCITY = 2;
-const DEFAULT_RADIUS = 5;
-const DEFAULT_ANGLE_TICK = Math.PI / 50;
-const DEFAULT_TRANSPARENT_CHANCE = 0.005;
-const DEFAULT_TRANSPARENT_TIME = 300;
+import GameOrchestrator from "../managers/GameOrchestrator";
+import PlayerManager from "../managers/PlayerManager";
+import BackgroundManager from "../managers/BackgroundManager";
+import * as CONFIG from "../configs/player.config";
 
 export default class Player {
 
@@ -32,8 +29,8 @@ export default class Player {
         this.y = _y;
         this.angle = _angle;
         this.color = _color;
-        this.radius = DEFAULT_RADIUS;
-        this.velocity = DEFAULT_VELOCITY;
+        this.radius = CONFIG.DEFAULT_PLAYER_RADIUS;
+        this.velocity = CONFIG.DEFAULT_PLAYER_VELOCITY;
         this.rightControl = _right;
         this.leftControl = _left;
 
@@ -56,8 +53,8 @@ export default class Player {
     private movePlayer = () => {
 
         // Rotate the player
-        if(this.rotatingRight) this.angle += DEFAULT_ANGLE_TICK;
-        if(this.rotatingLeft) this.angle -= DEFAULT_ANGLE_TICK;
+        if(this.rotatingRight) this.angle += CONFIG.DEFAULT_PLAYER_ANGLE_TICK;
+        if(this.rotatingLeft) this.angle -= CONFIG.DEFAULT_PLAYER_ANGLE_TICK;
 
         // Applying the velocity
         this.vx = this.velocity * Math.cos(this.angle);
@@ -71,7 +68,7 @@ export default class Player {
     private drawPlayer = () => {
 
         // Get canvas
-        const ctx = MainCanvas.getInstance().getContext();
+        const ctx = PlayerManager.getInstance().getContext();
         ctx.fillStyle = this.color;
 
         // Move the player
@@ -89,7 +86,7 @@ export default class Player {
         // We don't save the position if the player is transparent
         if(!this.isSolid) return;
 
-        const canvas = MainCanvas.getInstance();
+        const canvas = BackgroundManager.getInstance();
         const buffer = canvas.getBufferPlayerPosition();
         buffer.push({
             id: this.id,
@@ -103,12 +100,12 @@ export default class Player {
 
     private checkPlayerStatus = () => {
 
-        const canvas = MainCanvas.getInstance();
+        const canvas = BackgroundManager.getInstance();
 
         // If we are outside the board
-        if( this.x + this.radius >= canvas.getWith() - 1 ||
+        if( this.x + this.radius >= GameOrchestrator.getInstance().getWith() - 1 ||
             this.x - this.radius <= 1 ||
-            this.y + this.radius >= canvas.getHeiht() ||
+            this.y + this.radius >= GameOrchestrator.getInstance().getHeiht() ||
             this.y - this.radius <= 0
         ) this.isDead = true;
 
@@ -130,17 +127,6 @@ export default class Player {
         }
     };
 
-    private checkItems = () => {
-        const items = MainCanvas.getInstance().getItemList();
-        for(let item of items){
-            // Check if the player touch the item
-            const distanceToItem = Math.sqrt((this.x - item.getX()) ** 2 + (this.y - item.getY()) ** 2);
-            if(distanceToItem < this.radius + 40) {
-                console.log('Touching item');
-            }
-        }
-    };
-
     public render() {
 
         // If the player is dead, we can leave
@@ -148,9 +134,7 @@ export default class Player {
 
         this.movePlayer();
 
-        this.checkItems();
-
-        if(Math.random() <= DEFAULT_TRANSPARENT_CHANCE && this.isSolid) this.setTransparent();
+        if(Math.random() <= CONFIG.DEFAULT_PLAYER_TRANSPARENT_CHANCE && this.isSolid) this.setTransparent();
 
         this.checkPlayerStatus();
 
@@ -169,7 +153,7 @@ export default class Player {
         this.isSolid = false;
         setTimeout(() => {
             this.isSolid = true;
-        }, delay || DEFAULT_TRANSPARENT_TIME);
+        }, delay || CONFIG.DEFAULT_PLAYER_TRANSPARENT_TIME);
     };
 
     /*private accelerate = () => {

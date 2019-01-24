@@ -1,10 +1,10 @@
 import * as React from 'react';
 
-import MainCanvas from '../component/MainCanvas';
+import GameOrchestrator from '../managers/GameOrchestrator';
 
 interface MainLayoutProps {}
 interface MainLayoutState {
-    mainCanvas: MainCanvas
+    mainCanvas: GameOrchestrator
 }
 
 export default class MainLayout extends React.Component<MainLayoutProps, MainLayoutState> {
@@ -12,14 +12,27 @@ export default class MainLayout extends React.Component<MainLayoutProps, MainLay
     componentDidMount(){
 
         // Assigned the canvas
-        const canvas = MainCanvas.getInstance();
-        canvas.initializeCanvas(this.refs.mainCanvas as HTMLCanvasElement);
-        this.setState({mainCanvas: canvas});
+        const gameOrchestrator = GameOrchestrator.getInstance();
+        gameOrchestrator.initializeGame(
+            this.refs.backroundCanvas as HTMLCanvasElement,
+            this.refs.playerCanvas as HTMLCanvasElement,
+            this.refs.UICanvas as HTMLCanvasElement
+        );
+
+        // Start the game
+        gameOrchestrator.startGame();
 
     }
 
     render() {
-        return <canvas ref={'mainCanvas'}/>
+        return (
+            <React.Fragment>
+                <canvas ref={'backroundCanvas'}/>
+                <canvas ref={'itemsCanvas'} />
+                <canvas ref={'playerCanvas'} />
+                <canvas ref={'UICanvas'} />
+            </React.Fragment>
+        )
     }
 
 }

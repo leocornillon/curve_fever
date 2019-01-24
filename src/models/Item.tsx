@@ -1,7 +1,7 @@
-import MainCanvas from './MainCanvas';
+//import GameOrchestrator from './GameOrchestrator';
 import {getRandomArbitrary} from '../utils/math';
 
-const DEFAULT_ITEM_RADIUS = 40;
+//const DEFAULT_ITEM_RADIUS = 40;
 const BONUS_LIST = ['accelerate', 'transparent'];
 const MALUS_LIST = ['deccelerate'];
 
@@ -27,12 +27,12 @@ export default class Item {
 
     public render = () => {
         // Get canvas
-        const ctx = MainCanvas.getInstance().getContext();
+        /*const ctx = GameOrchestrator.getInstance().getContext();
         ctx.fillStyle = this.isBonus ? 'green' : 'red';
 
         ctx.beginPath();
         ctx.arc(this.x, this.y, DEFAULT_ITEM_RADIUS, 0, Math.PI * 2, false);
-        ctx.fill();
+        ctx.fill();*/
     }
 
 }
