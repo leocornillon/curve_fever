@@ -3,24 +3,37 @@ import PlayerManager from "../managers/PlayerManager";
 import Player from "./Player";
 import {getRandomArbitrary} from '../utils/math';
 import { DEFAULT_ITEM_RADIUS } from '../configs/item.config'
+import BackgroundManager from "../managers/BackgroundManager";
 
 const BONUS_LIST = ['accelerate', 'transparent', 'shrink', 'allAccelerate'];
 const MALUS_LIST = ['deccelerate', 'expand', 'allDeccelerate'];
+const NEUTRAL_LIST = ['erase'];
 
 export default class Item {
 
     private x: number;
     private y: number;
     private radius: number = DEFAULT_ITEM_RADIUS;
-    private isBonus: boolean;
+    private category: 'bonus' | 'malus' | 'neutral';
     private type: string;
 
     constructor(_x: number, _y: number) {
         this.x = _x;
         this.y = _y;
-        this.isBonus = Math.random() > 0.5;
-        const randomItem = this.isBonus ? Math.floor(getRandomArbitrary(0, BONUS_LIST.length)) : Math.floor(getRandomArbitrary(0, MALUS_LIST.length));
-        this.type = this.isBonus ? BONUS_LIST[randomItem] : MALUS_LIST[randomItem];
+        this.category = Math.random() < 0.3 ? 'bonus' : Math.random() > 0.5 ? 'malus' : 'neutral'
+        let randomItem: number;
+        if(this.category === 'bonus') {
+            randomItem = Math.floor(getRandomArbitrary(0, BONUS_LIST.length));
+            this.type = BONUS_LIST[randomItem];
+        }
+        else if (this.category === 'malus') {
+            randomItem = Math.floor(getRandomArbitrary(0, MALUS_LIST.length));
+            this.type = MALUS_LIST[randomItem];
+        }
+        else if (this.category === 'neutral') {
+            randomItem = Math.floor(getRandomArbitrary(0, NEUTRAL_LIST.length));
+            this.type = NEUTRAL_LIST[randomItem];
+        }
     }
 
     public getX = () => this.x;
@@ -59,6 +72,11 @@ export default class Item {
                     if(otherPlayer.getId() !== player.getId()) otherPlayer.deccelerate();
                 });
                 break;
+
+            // Manage neutral items
+            case 'erase':
+                BackgroundManager.getInstance().eraseTrailers();
+                break;
         }
 
         // Finally we can remove the item from the game
@@ -70,7 +88,9 @@ export default class Item {
         const ctx = ItemManager.getInstance().getContext();
 
         // Draw circle
-        ctx.fillStyle = this.isBonus ? 'green' : 'red';
+        if(this.category === 'bonus') ctx.fillStyle = 'green';
+        else if(this.category === 'malus') ctx.fillStyle = 'red';
+        else if(this.category === 'neutral') ctx.fillStyle = 'blue';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
         ctx.fill();

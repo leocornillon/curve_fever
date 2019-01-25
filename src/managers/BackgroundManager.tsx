@@ -97,6 +97,16 @@ export default class BackgroundManager {
         
     };
 
+    public eraseTrailers = () => {
+        // Clear the canvas
+        this.ctx.clearRect(0, 0, GameOrchestrator.getInstance().getWith(), GameOrchestrator.getInstance().getHeight());
+
+        // Erase old trailers
+        for(let i=0; i<this.gameOrchestrator.getWith(); i++)
+            for(let j=0; j<this.gameOrchestrator.getHeight(); j++)
+                this.gameBoard[i][j] = 0;
+    };
+
     public render = () => {
         this.drawPlayerTrailers();
         this.bufferPlayerPosition = [];
