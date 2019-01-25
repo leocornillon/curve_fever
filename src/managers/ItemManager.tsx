@@ -78,6 +78,13 @@ export default class ItemManager {
         }
     };
 
+    public removeItem = (item: Item) => {
+        const index = this.itemList.indexOf(item);
+        if (index > -1) {
+            this.itemList.splice(index, 1);
+        }
+    };
+
     public render = () => {
         this.addItem();
         this.drawItems();

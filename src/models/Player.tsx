@@ -2,6 +2,7 @@ import GameOrchestrator from "../managers/GameOrchestrator";
 import PlayerManager from "../managers/PlayerManager";
 import BackgroundManager from "../managers/BackgroundManager";
 import * as CONFIG from "../configs/player.config";
+import ItemManager from "../managers/ItemManager";
 
 export default class Player {
 
@@ -132,6 +133,15 @@ export default class Player {
         }
     };
 
+    private checkPlayerItems = () => {
+      const itemManager = ItemManager.getInstance();
+      itemManager.getitemList().forEach((item) => {
+          // Check if we touch the item
+          if(Math.sqrt((this.x - item.getX()) ** 2 + (this.y - item.getY()) ** 2) < this.radius + item.getRadius())
+            item.activate(this);
+      })
+    };
+
     public render() {
 
         // If the player is dead, we can leave
@@ -143,29 +153,52 @@ export default class Player {
 
         this.checkPlayerStatus();
 
+        this.checkPlayerItems();
+
         this.drawPlayer();
 
         if(!this.isDead) this.savePlayerPosition();
 
-    }
-
+    };
 
     /************************************************
      * Here comes function that alterate the player's status
      ************************************************/
 
-    private setTransparent = (delay?: number) => {
+    public setTransparent = (delay?: number) => {
         this.isSolid = false;
         setTimeout(() => {
             this.isSolid = true;
         }, delay || CONFIG.DEFAULT_PLAYER_TRANSPARENT_TIME);
     };
 
-    /*private accelerate = () => {
+    public accelerate = () => {
         this.velocity *= 2;
         setTimeout(() => {
             this.velocity /= 2;
-        }, 2000)
-    };*/
+        }, 3000)
+    };
+
+    public deccelerate = () => {
+        this.velocity /= 2;
+        setTimeout(() => {
+            this.velocity *= 2;
+        }, 3000)
+    };
+
+    public shrink = () => {
+        this.radius--;
+        setTimeout(() => {
+            this.radius++;
+        }, 4000)
+    };
+
+    public expand = () => {
+        this.radius += 3;
+        setTimeout(() => {
+            this.radius -= 3;
+        }, 3000)
+    };
+
 
 }

@@ -1,3 +1,3 @@
 
-export const DEFAULT_ITEM_APPARITION_RATE = 0.001;
+export const DEFAULT_ITEM_APPARITION_RATE = 0.005;
 export const DEFAULT_ITEM_RADIUS = 40;
