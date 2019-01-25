@@ -105,21 +105,26 @@ export default class Player {
         // If we are outside the board
         if( this.x + this.radius >= GameOrchestrator.getInstance().getWith() - 1 ||
             this.x - this.radius <= 1 ||
-            this.y + this.radius >= GameOrchestrator.getInstance().getHeight() ||
-            this.y - this.radius <= 0
-        ) this.isDead = true;
+            this.y + this.radius >= GameOrchestrator.getInstance().getHeight() - 1 ||
+            this.y - this.radius <= 1
+        ) {
+            this.isDead = true;
+        }
 
         // If the player touch another player trailer, he is dead
-        const gameBoard = canvas.getGameBoard();
-        let colisionNumber = 0, colisionChecked = 0;
-        for(let i=this.angle - Math.PI / 2; i<=this.angle + Math.PI / 2; i+=0.1) {
-            const x = Math.ceil(this.x + this.radius * Math.cos(i));
-            const y = Math.ceil(this.y + this.radius * Math.sin(i));
-            if (gameBoard[x][y] !== 0 && this.isSolid) colisionNumber++;
-            colisionChecked++;
+        else {
+            const gameBoard = canvas.getGameBoard();
+            let colisionNumber = 0, colisionChecked = 0;
+            for(let i=this.angle - Math.PI / 2; i<=this.angle + Math.PI / 2; i+=0.1) {
+                const x = Math.ceil(this.x + this.radius * Math.cos(i));
+                const y = Math.ceil(this.y + this.radius * Math.sin(i));
+                if (gameBoard[x][y] !== 0 && this.isSolid) colisionNumber++;
+                colisionChecked++;
+            }
+            // We need to apply a colision rate to be sure the colision is not an error
+            if( colisionNumber / colisionChecked > 0.3) this.isDead = true;
         }
-        // We need to apply a colision rate to be sure the colision is not an error
-        if( colisionNumber / colisionChecked > 0.3) this.isDead = true;
+
 
         // Change the color if the player is dead
         if(this.isDead){

@@ -77,7 +77,9 @@ export default class GameOrchestrator {
             this.height = document.documentElement.clientHeight;
 
             this.backgroundManager.initializeCanvas();
+            this.itemManager.initializeCanvas();
             this.playerManager.initializeCanvas();
+            this.uiManager.initializeCanvas();
         });
 
     };
