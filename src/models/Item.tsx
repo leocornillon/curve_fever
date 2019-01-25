@@ -1,10 +1,11 @@
 import ItemManager from "../managers/ItemManager";
+import PlayerManager from "../managers/PlayerManager";
 import Player from "./Player";
 import {getRandomArbitrary} from '../utils/math';
 import { DEFAULT_ITEM_RADIUS } from '../configs/item.config'
 
-const BONUS_LIST = ['accelerate', 'transparent', 'shrink'];
-const MALUS_LIST = ['deccelerate', 'expand'];
+const BONUS_LIST = ['accelerate', 'transparent', 'shrink', 'allAccelerate'];
+const MALUS_LIST = ['deccelerate', 'expand', 'allDeccelerate'];
 
 export default class Item {
 
@@ -40,6 +41,11 @@ export default class Item {
             case 'shrink':
                 player.shrink();
                 break;
+            case 'allAccelerate':
+                PlayerManager.getInstance().getPlayerList().forEach((otherPlayer) => {
+                    if(otherPlayer.getId() !== player.getId()) otherPlayer.accelerate();
+                });
+                break;
 
             // Manage malus
             case 'deccelerate':
@@ -47,6 +53,11 @@ export default class Item {
                 break;
             case 'expand':
                 player.expand();
+                break;
+            case 'allDeccelerate':
+                PlayerManager.getInstance().getPlayerList().forEach((otherPlayer) => {
+                    if(otherPlayer.getId() !== player.getId()) otherPlayer.deccelerate();
+                });
                 break;
         }
 
@@ -57,10 +68,18 @@ export default class Item {
     public render = () => {
         // Get canvas
         const ctx = ItemManager.getInstance().getContext();
+
+        // Draw circle
         ctx.fillStyle = this.isBonus ? 'green' : 'red';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
         ctx.fill();
+
+        // Draw text
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.font = '15px serif';
+        ctx.fillText(this.type, this.x , this.y + 7);
     };
 
 }

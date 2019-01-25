@@ -142,6 +142,8 @@ export default class Player {
       })
     };
 
+    public getId = () => this.id;
+
     public render() {
 
         // If the player is dead, we can leave
@@ -187,9 +189,10 @@ export default class Player {
     };
 
     public shrink = () => {
-        this.radius--;
+        this.radius -= 2;
+        if (this.radius < 1) this.radius = 1;
         setTimeout(() => {
-            this.radius++;
+            this.radius += 2;
         }, 4000)
     };
 
