@@ -29,7 +29,7 @@ export default class UIManager {
     private drawUI = () => {
         this.ctx.clearRect(0, 0, this.gameOrchestrator.getWith(), this.gameOrchestrator.getHeight());
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '30px serif';
+        this.ctx.font = '30px Sarabun';
         this.ctx.fillText(`${this.fps} FPS`, 20, 50);
     };
 

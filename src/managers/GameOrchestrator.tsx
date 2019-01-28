@@ -49,6 +49,7 @@ export default class GameOrchestrator {
     public getHeight = () => this.height;
 
     public initializeGame = (
+        gameContainer: HTMLDivElement,
         backgroundCanvas: HTMLCanvasElement,
         itemCanvas: HTMLCanvasElement,
         playerCanvas: HTMLCanvasElement,
@@ -56,8 +57,8 @@ export default class GameOrchestrator {
         ) => {
 
         // Setup canvas size
-        this.width = document.documentElement.clientWidth;
-        this.height = document.documentElement.clientHeight;
+        this.width = gameContainer.clientWidth;
+        this.height = gameContainer.clientHeight;
 
         // Initialize managers
         this.backgroundManager = BackgroundManager.getInstance();
@@ -73,8 +74,8 @@ export default class GameOrchestrator {
         window.addEventListener("resize", () => {
 
             // Setup canvas size
-            this.width = document.documentElement.clientWidth;
-            this.height = document.documentElement.clientHeight;
+            this.width = gameContainer.clientWidth;
+            this.height = gameContainer.clientHeight;
 
             this.backgroundManager.initializeCanvas();
             this.itemManager.initializeCanvas();

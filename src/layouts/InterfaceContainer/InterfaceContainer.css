@@ -1,0 +1,17 @@
+.interfaceContainer {
+    display: inline-block;
+    position: relative;
+
+    height: calc(100% - 30px);
+    width: calc(30% - 30px);
+
+    color: white;
+    background: rgba(0,0,0,0.9);
+
+    border-radius: 40px;
+    border: 15px solid white;
+}
+
+.interfaceTitle {
+    text-align: center;
+}
