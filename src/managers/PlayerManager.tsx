@@ -1,7 +1,7 @@
 import GameOrchestrator from './GameOrchestrator';
 import Player from '../models/Player';
 import BackgroundManager from "./BackgroundManager";
-import {getRandomArbitrary, getRandomColor} from '../utils/math';
+import {getRandomArbitrary} from '../utils/math';
 
 export default class PlayerManager {
 
@@ -35,7 +35,8 @@ export default class PlayerManager {
             getRandomArbitrary(0, this.gameOrchestrator.getWith() - 50),
             getRandomArbitrary(0, this.gameOrchestrator.getHeight() - 50),
             Math.random() * Math.PI * 2,
-            getRandomColor(),
+            //getRandomColor(),
+            'green',
             'ArrowLeft',
             'ArrowRight'
         ));
@@ -44,7 +45,8 @@ export default class PlayerManager {
             getRandomArbitrary(0, this.gameOrchestrator.getWith() - 50),
             getRandomArbitrary(0, this.gameOrchestrator.getHeight() - 50),
             Math.random() * Math.PI * 2,
-            getRandomColor(),
+            //getRandomColor(),
+            'violet',
             'q',
             'd'
         ));
@@ -53,7 +55,7 @@ export default class PlayerManager {
     private savePlayersPosition = () => {
 
         for(let position of this.backgroundManager.getBufferPlayerPosition()){
-            for(let i=((position.angle + Math.PI) % Math.PI*2) - Math.PI / 2 + 0.2; i<((position.angle + Math.PI) % Math.PI*2) + Math.PI / 2; i+=0.1){
+            for(let i=position.angle + Math.PI / 2; i<position.angle + 3 / 2 * Math.PI; i+=0.1){
                 const x = Math.ceil(position.x + position.radius * Math.cos(i));
                 const y = Math.ceil(position.y + position.radius * Math.sin(i));
                 this.backgroundManager.getGameBoard()[x][y] = position.id;

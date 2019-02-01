@@ -193,14 +193,14 @@ export default class Player {
         if (this.radius < 1) this.radius = 1;
         setTimeout(() => {
             this.radius += 2;
-        }, 4000)
+        }, 5000)
     };
 
     public expand = () => {
         this.radius += 3;
         setTimeout(() => {
             this.radius -= 3;
-        }, 3000)
+        }, 5000)
     };
 
 
