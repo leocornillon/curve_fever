@@ -15,6 +15,7 @@ export default class Player {
     private vy: number;
     private radius: number;
     private angle: number;
+    private angleTick: number = CONFIG.DEFAULT_PLAYER_ANGLE_TICK;
     private velocity: number;
     private color: string;
     private isSolid: boolean = true;
@@ -54,8 +55,8 @@ export default class Player {
     private movePlayer = () => {
 
         // Rotate the player
-        if(this.rotatingRight) this.angle += CONFIG.DEFAULT_PLAYER_ANGLE_TICK;
-        if(this.rotatingLeft) this.angle -= CONFIG.DEFAULT_PLAYER_ANGLE_TICK;
+        if(this.rotatingRight) this.angle += this.angleTick;
+        if(this.rotatingLeft) this.angle -= this.angleTick;
 
         // Applying the velocity
         this.vx = this.velocity * Math.cos(this.angle);
@@ -176,15 +177,19 @@ export default class Player {
 
     public accelerate = () => {
         this.velocity *= 2;
+        this.angleTick *= 2;
         setTimeout(() => {
             this.velocity /= 2;
+            this.angleTick /= 2;
         }, 3000)
     };
 
-    public deccelerate = () => {
+    public decelerate = () => {
         this.velocity /= 2;
+        this.angleTick /= 2;
         setTimeout(() => {
             this.velocity *= 2;
+            this.angleTick *= 2;
         }, 3000)
     };
 

@@ -13,8 +13,8 @@ import expand from '../assets/expand.png';
 import broom from '../assets/broom.png';
 import invisible from '../assets/invisible.png';
 
-const BONUS_LIST = ['accelerate', 'transparent', 'shrink', 'expand', 'deccelerate', 'expand'];
-const MALUS_LIST = ['allDeccelerate', 'allAccelerate'];
+const BONUS_LIST = ['accelerate', 'transparent', 'shrink', 'expand', 'decelerate', 'expand'];
+const MALUS_LIST = ['AllDecelerate', 'allAccelerate'];
 const NEUTRAL_LIST = ['erase'];
 
 export default class Item {
@@ -28,7 +28,7 @@ export default class Item {
     constructor(_x: number, _y: number) {
         this.x = _x;
         this.y = _y;
-        this.category = Math.random() < 0.3 ? 'bonus' : Math.random() > 0.5 ? 'malus' : 'neutral'
+        this.category = Math.random() < 0.2 ? 'neutral' : Math.random() > 0.5 ? 'malus' : 'bonus';
         let randomItem: number;
         if(this.category === 'bonus') {
             randomItem = Math.floor(getRandomArbitrary(0, BONUS_LIST.length));
@@ -71,8 +71,8 @@ export default class Item {
             case 'allAccelerate':
                 img.src = rabbit;
                 break;
-            case 'deccelerate':
-            case 'allDeccelerate':
+            case 'decelerate':
+            case 'allDecelerate':
                 img.src = tortoise;
                 break;
             case 'shrink':
@@ -119,15 +119,15 @@ export default class Item {
                 break;
 
             // Manage malus
-            case 'deccelerate':
-                player.deccelerate();
+            case 'decelerate':
+                player.decelerate();
                 break;
             case 'expand':
                 player.expand();
                 break;
-            case 'allDeccelerate':
+            case 'alldecelerate':
                 PlayerManager.getInstance().getPlayerList().forEach((otherPlayer) => {
-                    if(otherPlayer.getId() !== player.getId()) otherPlayer.deccelerate();
+                    if(otherPlayer.getId() !== player.getId()) otherPlayer.decelerate();
                 });
                 break;
 
