@@ -38,7 +38,7 @@ export default class ItemManager {
     };
 
     private drawItems = () => {
-        this.ctx.clearRect(0, 0, this.gameOrchestrator.getWith(), this.gameOrchestrator.getHeight());
+        //this.ctx.clearRect(0, 0, this.gameOrchestrator.getWith(), this.gameOrchestrator.getHeight());
         this.itemList.forEach(item => item.render());
     };
 
@@ -83,6 +83,9 @@ export default class ItemManager {
         if (index > -1) {
             this.itemList.splice(index, 1);
         }
+
+        // Clean the canvas
+        this.ctx.clearRect(0, 0, this.gameOrchestrator.getWith(), this.gameOrchestrator.getHeight());
     };
 
     public render = () => {

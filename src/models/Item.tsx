@@ -5,8 +5,16 @@ import {getRandomArbitrary} from '../utils/math';
 import { DEFAULT_ITEM_RADIUS } from '../configs/item.config'
 import BackgroundManager from "../managers/BackgroundManager";
 
-const BONUS_LIST = ['accelerate', 'transparent', 'shrink', 'allAccelerate'];
-const MALUS_LIST = ['deccelerate', 'expand', 'allDeccelerate'];
+// Import icons
+import rabbit from '../assets/rabbit.png';
+import tortoise from '../assets/tortoise.png';
+import contract from '../assets/contract.png';
+import expand from '../assets/expand.png';
+import broom from '../assets/broom.png';
+import invisible from '../assets/invisible.png';
+
+const BONUS_LIST = ['accelerate', 'transparent', 'shrink', 'expand', 'deccelerate', 'expand'];
+const MALUS_LIST = ['allDeccelerate', 'allAccelerate'];
 const NEUTRAL_LIST = ['erase'];
 
 export default class Item {
@@ -35,6 +43,56 @@ export default class Item {
             this.type = NEUTRAL_LIST[randomItem];
         }
     }
+
+    private drawItem = () => {
+        this.drawCircle();
+        this.drawIcons();
+    };
+
+    private drawCircle = () => {
+        // Get canvas
+        const ctx = ItemManager.getInstance().getContext();
+
+        if(this.category === 'bonus') ctx.fillStyle = 'green';
+        else if(this.category === 'malus') ctx.fillStyle = 'red';
+        else if(this.category === 'neutral') ctx.fillStyle = 'blue';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fill();
+    };
+
+    private drawIcons = () => {
+        // Get canvas
+        const ctx = ItemManager.getInstance().getContext();
+
+        const img = new Image();
+        switch(this.type) {
+            case 'accelerate':
+            case 'allAccelerate':
+                img.src = rabbit;
+                break;
+            case 'deccelerate':
+            case 'allDeccelerate':
+                img.src = tortoise;
+                break;
+            case 'shrink':
+                img.src = contract;
+                break;
+            case 'expand':
+                img.src = expand;
+                break;
+            case 'erase':
+                img.src = broom;
+                break;
+            case 'transparent':
+                img.src = invisible;
+                break;
+            default: console.log('No image', this.type); break;
+        }
+        img.width = DEFAULT_ITEM_RADIUS;
+        img.height = DEFAULT_ITEM_RADIUS;
+        ctx.drawImage(img, this.x - DEFAULT_ITEM_RADIUS / 2, this.y - DEFAULT_ITEM_RADIUS / 2, DEFAULT_ITEM_RADIUS, DEFAULT_ITEM_RADIUS);
+    };
 
     public getX = () => this.x;
     public getY = () => this.y;
@@ -84,22 +142,7 @@ export default class Item {
     };
 
     public render = () => {
-        // Get canvas
-        const ctx = ItemManager.getInstance().getContext();
-
-        // Draw circle
-        if(this.category === 'bonus') ctx.fillStyle = 'green';
-        else if(this.category === 'malus') ctx.fillStyle = 'red';
-        else if(this.category === 'neutral') ctx.fillStyle = 'blue';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fill();
-
-        // Draw text
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.font = '15px serif';
-        ctx.fillText(this.type, this.x , this.y + 7);
+        this.drawItem();
     };
 
 }
